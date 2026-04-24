@@ -676,7 +676,6 @@ let currentSavedId = null;
 // ═══════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
   loadSettings();
-  addPosition();
 
   const today = new Date();
   document.getElementById('c-date').value = fmtDate(today);
@@ -1299,7 +1298,6 @@ function resetOffer() {
   const nr = String(settings.nextNr || 1).padStart(4, '0');
   document.getElementById('offer-nr').value = prefix + nr;
 
-  addPosition();
   syncPrint();
 }
 
