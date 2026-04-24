@@ -216,6 +216,20 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#eef0f5;color:#222;min-h
       <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 29.8 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15 16.1 19.1 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 16.3 2 9.7 7.4 6.3 14.7z"/><path fill="#FBBC05" d="M24 46c5.5 0 10.5-1.9 14.3-5l-6.6-5.4C29.8 37 27 38 24 38c-5.8 0-10.7-3.1-11.8-7.5l-7 5.4C8.6 42 15.8 46 24 46z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.6 2.8-2.3 5.1-4.6 6.6l6.6 5.4C42 37.1 45 31 45 24c0-1.3-.2-2.7-.5-4z"/></svg>
       Mit Google anmelden
     </button>
+
+    <div style="display:flex;align-items:center;gap:10px;margin:20px 0">
+      <div style="flex:1;height:1px;background:#e0e0e0"></div>
+      <span style="font-size:.78rem;color:#bbb">oder</span>
+      <div style="flex:1;height:1px;background:#e0e0e0"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;text-align:left">
+      <input type="email" id="login-email" placeholder="E-Mail-Adresse" style="border:1px solid #ddd;border-radius:8px;padding:11px 14px;font-size:.9rem;font-family:inherit;outline:none;width:100%" onfocus="this.style.borderColor='#2a5a8c'" onblur="this.style.borderColor='#ddd'">
+      <input type="password" id="login-password" placeholder="Passwort" style="border:1px solid #ddd;border-radius:8px;padding:11px 14px;font-size:.9rem;font-family:inherit;outline:none;width:100%" onfocus="this.style.borderColor='#2a5a8c'" onblur="this.style.borderColor='#ddd'" onkeydown="if(event.key==='Enter')signInWithEmail()">
+      <div id="login-error" style="color:#c0392b;font-size:.8rem;display:none"></div>
+      <button onclick="signInWithEmail()" style="background:#1a3a5c;color:#fff;border:none;border-radius:8px;padding:12px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s" onmouseover="this.style.background='#0f2640'" onmouseout="this.style.background='#1a3a5c'">Anmelden</button>
+    </div>
+
     <div class="login-footer">Nur autorisierte Benutzer haben Zugriff.</div>
   </div>
 </div>
@@ -709,6 +723,24 @@ window.addEventListener('DOMContentLoaded', () => {
 function signInWithGoogle() {
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider).catch(err => alert('Anmeldung fehlgeschlagen: ' + err.message));
+}
+
+function signInWithEmail() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !password) { errEl.textContent = 'Bitte E-Mail und Passwort eingeben.'; errEl.style.display = 'block'; return; }
+  auth.signInWithEmailAndPassword(email, password).catch(err => {
+    const msgs = {
+      'auth/user-not-found':  'Kein Konto mit dieser E-Mail gefunden.',
+      'auth/wrong-password':  'Falsches Passwort.',
+      'auth/invalid-email':   'Ungültige E-Mail-Adresse.',
+      'auth/too-many-requests': 'Zu viele Versuche. Bitte kurz warten.'
+    };
+    errEl.textContent = msgs[err.code] || 'Anmeldung fehlgeschlagen.';
+    errEl.style.display = 'block';
+  });
 }
 
 function signOut() {
